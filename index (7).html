@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>PandaFuté — Chasseur d'abonnements fantômes</title>
+<meta name="description" content="Découvrez combien vous gaspillez chaque mois en abonnements oubliés. PandaFuté audite, identifie et vous aide à économiser.">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700&display=swap" rel="stylesheet">
+<style>
+:root{--saphir:#0F52BA;--saphir-light:#E9F0FB;--saphir-border:#BFD3F2;--creme:#F7F5F0;--creme-mid:#EDE9E1;--creme-dark:#D9D4C9;--vert:#2A7A4B;--vert-bg:#EBF5F0;--rouge:#C0584F;--rouge-bg:#FBEEE9;--noir:#1A1915;--encre:#2E2C27;--gris:#6B6860;--gris-light:#A8A59F;--blanc:#FFFFFF}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'DM Sans',sans-serif;background:var(--creme);color:var(--noir);-webkit-font-smoothing:antialiased}
+nav{display:flex;align-items:center;justify-content:space-between;padding:.9rem 1.5rem;max-width:1040px;margin:0 auto}
+.logo{display:flex;align-items:center;gap:.55rem;text-decoration:none}
+.logo-mark{width:46px;height:auto}
+.logo-word{font-family:'Playfair Display',serif;font-weight:900;font-size:1.35rem;color:var(--noir)}
+.logo .accent{color:var(--saphir)}
+.nav-tag{font-size:.72rem;font-weight:600;color:var(--saphir);background:var(--saphir-light);border:1px solid var(--saphir-border);padding:.3rem .7rem;border-radius:99px}
+/* HERO */
+.hero{padding:2rem 1.5rem 1rem;text-align:center}
+.hero-inner{max-width:880px;margin:0 auto}
+.hero h1{font-family:'Playfair Display',serif;font-weight:900;font-size:2.5rem;line-height:1.15;margin:.5rem 0 .7rem}
+.hero h1 em{font-style:normal;color:var(--rouge);text-decoration:underline wavy var(--rouge) 2px;text-underline-offset:4px}
+.hero-sub{color:var(--gris);font-size:1.05rem;line-height:1.5;max-width:620px;margin:0 auto 1.8rem}
+/* CALC CARD */
+.calc-card{background:var(--blanc);border-radius:20px;box-shadow:0 12px 48px rgba(26,25,21,.10);overflow:hidden;text-align:left;max-width:780px;margin:0 auto}
+.calc-head{background:var(--saphir);color:#fff;padding:.8rem 1.2rem;font-weight:700;font-size:.9rem;display:flex;align-items:center;gap:.5rem}
+.calc-body{padding:1.2rem 1.4rem;max-height:520px;overflow-y:auto}
+.cat-title{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--gris-light);margin:1rem 0 .4rem;padding-top:.6rem;border-top:1px solid var(--creme-mid)}
+.cat-title:first-child{border:none;margin-top:0;padding-top:0}
+.sub-row{display:flex;align-items:center;gap:.5rem;padding:.35rem 0;border-bottom:1px solid var(--creme)}
+.sub-row label{display:flex;align-items:center;gap:.5rem;flex:1;font-size:.88rem;cursor:pointer;color:var(--gris)}
+.sub-row label input[type=checkbox]{width:17px;height:17px;accent-color:var(--saphir);cursor:pointer}
+.sub-row.active label{color:var(--noir);font-weight:600}
+.sub-controls{display:none;align-items:center;gap:.4rem}
+.sub-row.active .sub-controls{display:flex}
+.sub-price{width:58px;text-align:right;border:1px solid var(--creme-dark);border-radius:6px;padding:.2rem .3rem;font-size:.84rem}
+.sub-unit{font-size:.75rem;color:var(--gris-light)}
+.btn-ghost{border:none;background:#E8712B;width:42px;height:42px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;box-shadow:0 2px 8px rgba(232,113,43,.3);flex-shrink:0}
+.btn-ghost:hover{transform:scale(1.12);box-shadow:0 4px 14px rgba(232,113,43,.45)}
+.sub-row.ghost .btn-ghost{background:#C0584F;transform:scale(1.1)}
+.sub-row.ghost{background:var(--rouge-bg)}
+.sub-row.ghost label{color:var(--rouge);text-decoration:line-through}
+.sub-row.ghost .sub-price{color:var(--rouge);border-color:var(--rouge)}
+.add-row{margin:.6rem 0 0}
+.add-row button{background:var(--saphir-light);color:var(--saphir);border:1px dashed var(--saphir-border);border-radius:8px;padding:.4rem .8rem;font-size:.8rem;font-weight:700;cursor:pointer;width:100%}
+/* RESULT */
+.calc-result{border-top:2px solid var(--creme-dark);padding:1.2rem 1.4rem;display:flex;flex-wrap:wrap;gap:1rem;align-items:center;justify-content:space-around}
+.res-box{text-align:center}
+.res-label{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--gris)}
+.res-val{font-family:'Playfair Display',serif;font-weight:900;font-size:1.8rem;line-height:1}
+.res-val.total{color:var(--noir)}
+.res-val.ghost{color:var(--rouge)}
+.res-val.save{color:var(--vert)}
+.res-sub{font-size:.75rem;color:var(--gris-light)}
+.calc-cta{background:var(--vert-bg);border-top:1px solid var(--vert);padding:1rem 1.4rem;text-align:center}
+.calc-cta p{font-size:.9rem;color:var(--encre);margin-bottom:.6rem}
+.calc-cta .btn{display:inline-block;background:var(--saphir);color:#fff;border:none;padding:.65rem 1.6rem;border-radius:10px;font-size:.95rem;font-weight:700;cursor:pointer;text-decoration:none}
+.calc-cta .btn:hover{background:#0A3A85}
+.hero-foot{font-size:.82rem;color:var(--gris-light);font-style:italic;margin-top:1rem;max-width:560px;margin-left:auto;margin-right:auto}
+/* STATS */
+.stats{padding:3.5rem 1.5rem;text-align:center}
+.stats h2{font-family:'Playfair Display',serif;font-weight:900;font-size:1.9rem;margin-bottom:1.8rem}
+.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.2rem;max-width:820px;margin:0 auto}
+.stat-card{background:var(--blanc);border:1px solid var(--creme-dark);border-radius:16px;padding:1.5rem 1rem}
+.stat-big{font-family:'Playfair Display',serif;font-weight:900;font-size:2.2rem;color:var(--saphir)}
+.stat-text{font-size:.88rem;color:var(--gris);margin-top:.3rem;line-height:1.4}
+/* HOW */
+.how{padding:3.5rem 1.5rem;background:var(--creme-mid);text-align:center}
+.how h2{font-family:'Playfair Display',serif;font-weight:900;font-size:1.9rem;margin-bottom:1.8rem}
+.how-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;max-width:820px;margin:0 auto}
+.how-step{background:var(--blanc);border-radius:16px;padding:1.6rem 1.2rem}
+.how-num{font-family:'Playfair Display',serif;font-weight:900;font-size:2rem;color:var(--saphir);margin-bottom:.3rem}
+.how-title{font-weight:700;font-size:1rem;margin-bottom:.4rem}
+.how-desc{font-size:.88rem;color:var(--gris);line-height:1.45}
+/* POSITIONING */
+.pos{padding:3.5rem 1.5rem;text-align:center}
+.pos h2{font-family:'Playfair Display',serif;font-weight:900;font-size:1.9rem;margin-bottom:.8rem}
+.pos p{max-width:640px;margin:.7rem auto 0;font-size:1.02rem;line-height:1.55;color:var(--gris)}
+.pos strong{color:var(--noir)}
+/* CTA */
+.cta{padding:3.5rem 1.5rem;background:var(--encre);text-align:center;color:var(--creme)}
+.cta h2{font-family:'Playfair Display',serif;font-weight:900;font-size:1.9rem;color:var(--blanc);margin-bottom:.6rem}
+.cta p{color:var(--gris-light);font-size:1rem;margin-bottom:1.5rem}
+.cta-form{display:flex;gap:.5rem;max-width:440px;margin:0 auto;flex-wrap:wrap;justify-content:center}
+.cta-form input[type=email]{flex:1;min-width:220px;padding:.65rem 1rem;border:1px solid var(--gris);border-radius:10px;font-size:.95rem;background:var(--encre);color:var(--blanc)}
+.cta-form .btn{background:var(--saphir);color:#fff;border:none;padding:.65rem 1.4rem;border-radius:10px;font-size:.95rem;font-weight:700;cursor:pointer}
+.cta-note{font-size:.75rem;color:var(--gris-light);margin-top:.8rem}
+footer{text-align:center;padding:1.5rem;font-size:.78rem;color:var(--gris-light)}
+@media(max-width:700px){
+  .hero h1{font-size:1.7rem}
+  .hero-sub{font-size:.92rem}
+  .stats-grid,.how-grid{grid-template-columns:1fr}
+  .calc-body{max-height:none}
+  .stats h2,.how h2,.pos h2,.cta h2{font-size:1.5rem}
+}
+@media(max-width:480px){
+  nav{padding:.7rem 1rem;gap:.4rem}
+  .nav-tag{font-size:.6rem;padding:.25rem .5rem;white-space:nowrap;max-width:120px;overflow:hidden;text-overflow:ellipsis}
+  .logo-word{font-size:1.15rem}
+  .logo-mark{width:38px}
+  .hero{padding:1.5rem 1rem .8rem}
+  .hero h1{font-size:1.45rem;line-height:1.2}
+  .hero-sub{font-size:.88rem;margin-bottom:1.2rem}
+  .calc-card{border-radius:14px}
+  .calc-head{font-size:.82rem;padding:.65rem 1rem}
+  .calc-body{padding:.8rem 1rem}
+  .cat-title{font-size:.65rem;margin:.8rem 0 .3rem}
+  .sub-row{padding:.4rem 0;gap:.35rem;flex-wrap:wrap}
+  .sub-row label{font-size:.84rem;gap:.4rem}
+  .sub-row label input[type=checkbox]{width:20px;height:20px;flex-shrink:0}
+  .sub-controls{gap:.35rem}
+  .sub-price{width:52px;font-size:.82rem;padding:.25rem .3rem}
+  .btn-ghost{width:44px;height:44px}
+  .add-row{padding:0 1rem .6rem}
+  .add-row button{font-size:.78rem;padding:.45rem .6rem}
+  .calc-result{padding:1rem;gap:.6rem;flex-direction:column}
+  .res-box{display:flex;align-items:baseline;gap:.5rem;width:100%}
+  .res-label{font-size:.68rem;min-width:110px;text-align:left}
+  .res-val{font-size:1.4rem}
+  .res-sub{font-size:.7rem}
+  .calc-cta{padding:.8rem 1rem}
+  .calc-cta p{font-size:.85rem}
+  .calc-cta .btn{font-size:.88rem;padding:.55rem 1.2rem;width:100%}
+  .hero-foot{font-size:.75rem;margin-top:.7rem}
+  .stats{padding:2.5rem 1rem}
+  .stat-card{padding:1.1rem .8rem}
+  .stat-big{font-size:1.8rem}
+  .stat-text{font-size:.82rem}
+  .how{padding:2.5rem 1rem}
+  .how-step{padding:1.2rem 1rem}
+  .how-num{font-size:1.5rem}
+  .how-title{font-size:.92rem}
+  .how-desc{font-size:.82rem}
+  .pos{padding:2.5rem 1rem}
+  .pos p{font-size:.92rem}
+  .cta{padding:2.5rem 1rem}
+  .cta h2{font-size:1.4rem}
+  .cta p{font-size:.9rem}
+  .cta-form{flex-direction:column}
+  .cta-form input[type=email]{min-width:0;width:100%;font-size:.9rem}
+  .cta-form .btn{width:100%;font-size:.9rem}
+}
+
+.cta-embed{max-width:480px;margin:0 auto}
+.cta-embed iframe{border-radius:10px}
+.hero-cta-text{font-weight:500;color:var(--encre);font-size:1.05rem}
+</style>
+</head>
+<body>
+
+<nav>
+<a class="logo" href="#">
+  <svg class="logo-mark" viewBox="0 0 205 180" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <defs><linearGradient id="cap" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2E6BD0"/><stop offset="1" stop-color="#0F52BA"/></linearGradient></defs>
+    <path d="M60 180 q5 -36 45 -36 q40 0 45 36 z" fill="#1A1915"/><ellipse cx="105" cy="176" rx="26" ry="20" fill="#FFF"/>
+    <path d="M124 150 q32 -4 44 -44 q3 -12 10 -12 l8 6 q4 10 -2 22 q-12 26 -36 36 q-16 7 -28 -5 z" fill="#1A1915"/>
+    <rect x="163" y="64" width="30" height="30" rx="11" fill="#1A1915"/><line x1="171" y1="70" x2="171" y2="90" stroke="#322F2A" stroke-width="2"/><line x1="179" y1="70" x2="179" y2="90" stroke="#322F2A" stroke-width="2"/><line x1="187" y1="71" x2="187" y2="89" stroke="#322F2A" stroke-width="2"/>
+    <rect x="165" y="40" width="14" height="28" rx="7" fill="#1A1915"/>
+    <circle cx="66" cy="56" r="18" fill="#1A1915"/><circle cx="144" cy="56" r="18" fill="#1A1915"/><circle cx="66" cy="56" r="7" fill="#322F2A"/><circle cx="144" cy="56" r="7" fill="#322F2A"/>
+    <ellipse cx="105" cy="100" rx="54" ry="50" fill="#FFF" stroke="#1A1915" stroke-width="3"/>
+    <path d="M77 73 q9 -4 18 -1" fill="none" stroke="#1A1915" stroke-width="2.4" stroke-linecap="round"/><path d="M115 72 q9 -3 18 1" fill="none" stroke="#1A1915" stroke-width="2.4" stroke-linecap="round"/>
+    <ellipse cx="85" cy="96" rx="14" ry="19" fill="#1A1915" transform="rotate(14 85 96)"/><ellipse cx="125" cy="96" rx="14" ry="19" fill="#1A1915" transform="rotate(-14 125 96)"/>
+    <circle cx="86" cy="95" r="7.5" fill="#FFF"/><circle cx="124" cy="95" r="7.5" fill="#FFF"/><circle cx="86" cy="95" r="4" fill="#1A1915"/><circle cx="124" cy="95" r="4" fill="#1A1915"/><circle cx="87.5" cy="93.5" r="1.5" fill="#FFF"/><circle cx="125.5" cy="93.5" r="1.5" fill="#FFF"/>
+    <path d="M105 112 q-7 0 -5.5 -5 q2 -3 5.5 -3 q3.5 0 5.5 3 q1.5 5 -5.5 5 z" fill="#1A1915"/>
+    <path d="M90 120 q15 14 30 0" fill="none" stroke="#1A1915" stroke-width="3" stroke-linecap="round"/><path d="M95 123 q10 7 20 0 q-10 3 -20 0 z" fill="#C56B7A"/>
+    <path d="M55 64 a52 52 0 0 1 100 0 q-52 -15 -100 0 z" fill="url(#cap)"/><path d="M76 42 q29 -9 58 6" fill="none" stroke="#0A3A85" stroke-width="1.6" opacity=".55"/><path d="M62 63 q-32 4 -36 17 q24 6 47 -6 z" fill="#0A3A85"/><circle cx="105" cy="18" r="4.5" fill="#0A3A85"/>
+  </svg>
+  <span class="logo-word">Panda<span class="accent">Futé</span></span>
+</a>
+<span class="nav-tag">Chasseur d'abonnements fantômes</span>
+</nav>
+
+<section class="hero">
+<div class="hero-inner">
+  <h1>Vos abonnements vous coûtent bien plus que vous ne croyez</h1>
+  <p class="hero-sub">Streaming, forfaits, applis, salles de sport, logiciels… Chaque mois, des dizaines d’euros s’échappent de votre compte pour des services que vous n’utilisez plus. Vous ne les voyez pas. Votre banque ne vous prévient pas. <strong>Ils sont là, silencieux, et ils grignotent votre budget.</strong></p>
+  <p class="hero-sub hero-cta-text">N’attendez pas — <strong>colmatez les fuites de votre compte bancaire.</strong> Cochez, marquez les fantômes, et voyez ce que vous récupérez.</p>
+
+  <div class="calc-card">
+    <div class="calc-head">🔍 Votre audit d'abonnements — 2 minutes chrono</div>
+    <div class="calc-body" id="calc-body"></div>
+    <div class="add-row" style="padding:0 1.4rem .8rem"><button type="button" onclick="addCustom()">+ Ajouter un abonnement non listé</button></div>
+    <div class="calc-result">
+      <div class="res-box"><div class="res-label">Vos abonnements</div><div class="res-val total" id="r-total">0 €</div><div class="res-sub">par mois</div></div>
+      <div class="res-box"><div class="res-label">👻 Fantômes</div><div class="res-val ghost" id="r-ghost">0 €</div><div class="res-sub" id="r-ghost-year">0 €/an gaspillés</div></div>
+      <div class="res-box"><div class="res-label">💰 Économie possible</div><div class="res-val save" id="r-save">0 €</div><div class="res-sub">par an</div></div>
+    </div>
+    <div class="calc-cta" id="calc-cta" style="display:none">
+      <p>PandaFuté peut vous aider à <strong>résilier</strong> les fantômes et <strong>remplacer par moins cher</strong>.</p>
+      <button class="btn" data-tally-open="MeVONA" data-tally-width="400" data-tally-emoji-animation="wave" data-tally-hidden="source=landing">Je veux économiser →</button>
+    </div>
+  </div>
+  <p class="hero-foot">Aucune donnée bancaire demandée. Tout reste dans votre navigateur.</p>
+</div>
+</section>
+
+<section class="stats">
+<h2>Les chiffres qui font mal</h2>
+<div class="stats-grid">
+  <div class="stat-card"><div class="stat-big">49 €</div><div class="stat-text">dépensés par mois en abonnements numériques — en hausse chaque année</div></div>
+  <div class="stat-card"><div class="stat-big">40 %</div><div class="stat-text">des Français paient pour des abonnements qu'ils n'utilisent plus</div></div>
+  <div class="stat-card"><div class="stat-big">81 €</div><div class="stat-text">par mois en « fantômes » — soit presque 1 000 € par an envolés</div></div>
+</div>
+</section>
+
+<section class="how">
+<h2>Comment ça marche ?</h2>
+<div class="how-grid">
+  <div class="how-step"><div class="how-num">1</div><div class="how-title">Auditez</div><div class="how-desc">Parcourez la liste par catégorie. PandaFuté vous rappelle des abonnements que vous aviez oubliés.</div></div>
+  <div class="how-step"><div class="how-num">2</div><div class="how-title">Identifiez les fantômes</div><div class="how-desc">Marquez d'un 👻 ceux que vous n'utilisez plus. PandaFuté calcule le gaspillage.</div></div>
+  <div class="how-step"><div class="how-num">3</div><div class="how-title">Agissez</div><div class="how-desc">Résiliez ou remplacez par une alternative moins chère. C'est là que vous économisez — et que PandaFuté se rémunère.</div></div>
+</div>
+</section>
+
+<section class="pos">
+<h2>PandaFuté n'est pas un comparateur</h2>
+<p>Les comparateurs attendent que vous cherchiez « forfait mobile pas cher » sur Google. <strong>PandaFuté fait l'inverse</strong> : il révèle un gaspillage dont vous n'aviez pas conscience, puis vous aide à agir. On crée la prise de conscience — les comparateurs, eux, captent une intention qui existe déjà.</p>
+<p>Et on ne remplace pas votre banque. Aucune connexion bancaire, aucun accès à vos comptes. Juste un audit intelligent, guidé par catégories, qui fait le travail que personne n'a jamais le temps de faire.</p>
+</section>
+
+<section class="cta" id="cta-section">
+<h2>Envie de traquer vos fantômes ?</h2>
+<p>PandaFuté est en construction. Laissez votre email pour être parmi les premiers à tester.</p>
+<div class="cta-embed">
+  <iframe data-tally-src="https://tally.so/embed/MeVONA?alignLeft=1&hideTitle=1&transparentBackground=1&dynamicHeight=1&darkMode=1" loading="lazy" width="100%" height="150" frameborder="0" title="Liste d'attente PandaFuté"></iframe>
+</div>
+<p class="cta-note">30 secondes · Pas de spam · Juste un email quand c'est prêt</p>
+</section>
+
+<footer>PandaFuté · Chasseur d'abonnements fantômes · France 2026</footer>
+
+<script>
+var SUBS = [
+  {cat:"Streaming vidéo", items:[
+    {n:"Netflix",p:14},{n:"Disney+",p:9},{n:"Amazon Prime Video",p:7},{n:"Canal+",p:24},{n:"Apple TV+",p:10},{n:"Paramount+",p:8},{n:"OCS",p:12}
+  ]},
+  {cat:"Musique", items:[
+    {n:"Spotify",p:11},{n:"Deezer",p:11},{n:"Apple Music",p:11},{n:"YouTube Music",p:11}
+  ]},
+  {cat:"Télécom & Internet", items:[
+    {n:"Forfait mobile",p:20},{n:"Box internet / fibre",p:35}
+  ]},
+  {cat:"Cloud & stockage", items:[
+    {n:"iCloud+",p:3},{n:"Google One",p:3},{n:"Dropbox",p:12},{n:"OneDrive",p:2}
+  ]},
+  {cat:"Jeux vidéo", items:[
+    {n:"PlayStation Plus",p:9},{n:"Xbox Game Pass",p:11},{n:"Nintendo Online",p:4}
+  ]},
+  {cat:"Sport & loisirs", items:[
+    {n:"Salle de sport",p:30},{n:"Carte cinéma illimitée",p:22}
+  ]},
+  {cat:"Livraison & services", items:[
+    {n:"Amazon Prime",p:7},{n:"Uber Eats Pass",p:10}
+  ]},
+  {cat:"Logiciels & outils pro", items:[
+    {n:"Adobe Creative Cloud",p:60},{n:"Microsoft 365",p:7},{n:"Canva Pro",p:12},{n:"ChatGPT Plus",p:22}
+  ]},
+  {cat:"Presse & médias", items:[
+    {n:"Abonnement presse en ligne",p:10}
+  ]},
+  {cat:"\u00C9nergie", items:[
+    {n:"\u00C9lectricit\u00E9",p:65},{n:"Gaz",p:45}
+  ]},
+  {cat:"Assurances", items:[
+    {n:"Assurance auto",p:50},{n:"Assurance habitation",p:25},{n:"Mutuelle santé",p:45}
+  ]}
+];
+
+var body = document.getElementById('calc-body');
+SUBS.forEach(function(cat){
+  var h = document.createElement('div'); h.className='cat-title'; h.textContent=cat.cat; body.appendChild(h);
+  cat.items.forEach(function(it){ body.appendChild(makeRow(it.n, it.p)); });
+});
+
+function makeRow(name, price){
+  var d=document.createElement('div'); d.className='sub-row';
+  d.innerHTML='<label><input type="checkbox" class="sub-check"> '+name+'</label>'
+    +'<span class="sub-controls"><input type="number" class="sub-price" value="'+price+'" min="0" step="0.5"> <span class="sub-unit">\u20AC</span> '
+    +'<button type="button" class="btn-ghost" title="Marquer comme fant\u00F4me"><svg viewBox="0 0 28 32" width="22" height="26"><path d="M14 2C7 2 2 8 2 15v13l4-4 4 4 4-4 4 4 4-4 4 4V15C26 8 21 2 14 2z" fill="#fff"/><circle cx="10" cy="14" r="2.8" fill="#1A1915"/><circle cx="18" cy="14" r="2.8" fill="#1A1915"/><circle cx="11" cy="12.8" r="1" fill="#fff"/><circle cx="19" cy="12.8" r="1" fill="#fff"/><path d="M10 21Q14 24 18 21" fill="none" stroke="#1A1915" stroke-width="1.5" stroke-linecap="round"/></svg></button></span>';
+  var cb=d.querySelector('.sub-check');
+  cb.addEventListener('change',function(){d.classList.toggle('active',cb.checked);if(!cb.checked){d.classList.remove('ghost');}recalc();});
+  d.querySelector('.btn-ghost').addEventListener('click',function(){
+    var live=d.querySelector('.sub-check'); if(!live||!live.checked)return;
+    d.classList.toggle('ghost'); recalc();
+  });
+  d.querySelector('.sub-price').addEventListener('input', recalc);
+  return d;
+}
+
+function addCustom(){
+  var last=body.querySelector('.cat-title:last-of-type');
+  if(!last||last.textContent!=='Autres'){var h=document.createElement('div');h.className='cat-title';h.textContent='Autres';body.appendChild(h);}
+  var r=makeRow('Mon abonnement',10);
+  r.querySelector('label').innerHTML='<input type="checkbox" class="sub-check" checked> <input type="text" value="Mon abonnement" style="border:none;border-bottom:1px dashed #ccc;font-size:.88rem;width:140px;background:transparent">';
+  r.classList.add('active');
+  var nc=r.querySelector('.sub-check');
+  nc.checked=true;
+  nc.addEventListener('change',function(){r.classList.toggle('active',nc.checked);if(!nc.checked){r.classList.remove('ghost');}recalc();});
+  body.appendChild(r);
+  recalc();
+}
+
+function recalc(){
+  var total=0,ghost=0;
+  document.querySelectorAll('.sub-row.active').forEach(function(r){
+    var v=parseFloat(r.querySelector('.sub-price').value)||0;
+    total+=v;
+    if(r.classList.contains('ghost')) ghost+=v;
+  });
+  document.getElementById('r-total').textContent=Math.round(total)+' \u20AC';
+  document.getElementById('r-ghost').textContent=Math.round(ghost)+' \u20AC';
+  document.getElementById('r-ghost-year').textContent=Math.round(ghost*12)+' \u20AC/an gaspill\u00E9s';
+  document.getElementById('r-save').textContent=Math.round(ghost*12)+' \u20AC';
+  document.getElementById('calc-cta').style.display = ghost>0 ? 'block' : 'none';
+}
+
+
+</script>
+<script src="https://tally.so/widgets/embed.js"></script>
+</body>
+</html>
